@@ -19,7 +19,44 @@ let foodName = [
   "김밥",
 ];
 let number = [0, 1, 2, 3, 4, 5, 6, 7];
-let foods = document.querySelectorAll(".food");
+
+let firstImg = document.querySelector(".first");
+let secondImg = document.querySelector(".second");
+let thirdImg = document.querySelector(".third");
+let fourthImg = document.querySelector(".fourth");
+
+//첫번째 화면 클릭하거나 3초 뒤 게임화면으로 넘어간다.
+setTimeout(() => {
+  firstImg.classList.add("oZero");
+}, 3000);
+firstImg.addEventListener("click", () => {
+  firstImg.classList.add("oZero");
+});
+//게임 클리어화면, 클릭시 새로고침
+secondImg.addEventListener("click", () => {
+  window.location.reload();
+});
+//3번틀릴시 화면, 클릭시 새로고침
+fourthImg.addEventListener("click", () => {
+  window.location.reload();
+});
+//답안 클릭시 화면, 클릭시 새로고침
+thirdImg.addEventListener("click", () => {
+  window.location.reload();
+});
+//정답 확인하기
+document.querySelector(".confirm").addEventListener("click", () => {
+  document.querySelectorAll(".foodList li input").forEach((data) => {
+    data.checked = true;
+  });
+  setTimeout(() => {
+    thirdImg.classList.add("oOne");
+  }, 2000);
+});
+//다시하기
+document.querySelector(".again").addEventListener("click", () => {
+  window.location.reload();
+});
 
 //배열안의 내용을 섞는 함수
 function numberShuffling(number) {
@@ -50,34 +87,23 @@ function oneCount(arr) {
   }).length;
 }
 
-//다시하기
-document.querySelector(".again").addEventListener("click", () => {
-  window.location.reload();
-});
-
-//정답 확인하기
-document.querySelector(".confirm").addEventListener("click", () => {
-  document.querySelectorAll(".foodList li input").forEach((data) => {
-    data.checked = true;
-  });
-  setTimeout(() => {
-    window.location.reload();
-  }, 5000);
-});
-
 function ramdomFoodShow() {
+  let foods = document.querySelectorAll(".food");
   let disLikeCount = 0;
+  let likeCount = 0;
   let randomNumber = numberShuffling(number);
   let dragonLikeFood = dragonRandomLikeFood();
-  console.log(dragonLikeFood);
   foods.forEach((data, i) => {
     //음식 클래스 이름 추가
     data.classList.add(imgName[randomNumber[i]]);
+
     //음식 설명 글 추가
     data.querySelector(".introduce").innerHTML = foodName[randomNumber[i]];
+
     //드레곤이 좋아하는 음식, 싫어하는 음식에 해당하는 클래스 추가
     if (dragonLikeFood[i]) data.classList.add("like");
     else data.classList.add("dislike");
+
     //드래곤이 좋아하는 음식 수 표시
     document.querySelector(".foodCount strong").innerHTML =
       oneCount(dragonLikeFood);
@@ -92,7 +118,16 @@ function ramdomFoodShow() {
           check.innerHTML = "틀렸습니다.";
         }
       } else {
-        check.innerHTML = "맞았습니다.";
+        if (!data.classList.contains("validation")) {
+          likeCount += 1;
+          data.classList.add("validation");
+          check.innerHTML = "맞았습니다.";
+        }
+      }
+      if (disLikeCount >= 3) {
+        fourthImg.classList.add("oOne");
+      } else if (likeCount == oneCount(dragonLikeFood)) {
+        secondImg.classList.add("oOne");
       }
     });
   });
